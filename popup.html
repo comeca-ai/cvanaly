@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Começa AI - Meu Prompt</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <img src="icons/icon48.png" alt="Começa AI" class="logo-icon">
+                <span class="logo-text">Começa AI</span>
+            </div>
+            <div class="header-actions">
+                <button class="btn-icon" id="marketplace-btn" title="Marketplace">
+                    <i class="fas fa-store"></i>
+                </button>
+                <button class="btn-icon" id="settings-btn" title="Configurações">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-container">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="search-container">
+                    <div class="search-box">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="search-input" placeholder="Pesquisar prompts...">
+                    </div>
+                </div>
+
+                <div class="folders-section">
+                    <div class="section-header">
+                        <h3>Pastas</h3>
+                        <button class="btn-icon" id="add-folder-btn" title="Nova pasta">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <ul class="folders-list" id="folders-list">
+                        <li class="folder-item active" data-folder="todos">
+                            <i class="fas fa-folder-open"></i>
+                            <span>Todos os prompts</span>
+                            <span class="count">0</span>
+                        </li>
+                        <li class="folder-item" data-folder="favoritos">
+                            <i class="fas fa-star"></i>
+                            <span>Favoritos</span>
+                            <span class="count">0</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn-primary" id="new-prompt-btn">
+                        <i class="fas fa-plus"></i>
+                        Novo Prompt
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Content Area -->
+            <main class="content-area">
+                <div class="content-header">
+                    <h2 id="content-title">Todos os prompts</h2>
+                    <div class="view-controls">
+                        <button class="btn-icon view-btn active" id="grid-view" title="Visualização em grade">
+                            <i class="fas fa-th"></i>
+                        </button>
+                        <button class="btn-icon view-btn" id="list-view" title="Visualização em lista">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Empty State -->
+                <div class="empty-state" id="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <h3>Nenhum prompt encontrado</h3>
+                    <p>Crie seu primeiro prompt para começar a organizar suas ideias!</p>
+                    <button class="btn-primary" onclick="showCreatePrompt()">
+                        <i class="fas fa-plus"></i>
+                        Criar primeiro prompt
+                    </button>
+                </div>
+
+                <!-- Prompts Grid -->
+                <div class="prompts-grid" id="prompts-grid">
+                    <!-- Prompts will be dynamically inserted here -->
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal for Create/Edit Prompt -->
+    <div class="modal-overlay" id="prompt-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">Novo Prompt</h3>
+                <button class="btn-icon" id="close-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="prompt-form">
+                    <div class="form-group">
+                        <label for="prompt-title">Título do Prompt</label>
+                        <input type="text" id="prompt-title" required placeholder="Digite o título do prompt">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="prompt-category">Categoria</label>
+                        <select id="prompt-category">
+                            <option value="geral">Geral</option>
+                            <option value="escrita">Escrita</option>
+                            <option value="codigo">Código</option>
+                            <option value="marketing">Marketing</option>
+                            <option value="educacao">Educação</option>
+                            <option value="negocios">Negócios</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="prompt-folder">Pasta</label>
+                        <select id="prompt-folder">
+                            <option value="todos">Todos os prompts</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="prompt-content">Conteúdo do Prompt</label>
+                        <textarea id="prompt-content" required placeholder="Digite o conteúdo do seu prompt aqui..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="prompt-tags">Tags (separadas por vírgula)</label>
+                        <input type="text" id="prompt-tags" placeholder="chatgpt, ia, automação">
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="closeModal()">Cancelar</button>
+                        <button type="submit" class="btn-primary">Salvar Prompt</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Create Folder -->
+    <div class="modal-overlay" id="folder-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Nova Pasta</h3>
+                <button class="btn-icon" onclick="closeFolderModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="folder-form">
+                    <div class="form-group">
+                        <label for="folder-name">Nome da Pasta</label>
+                        <input type="text" id="folder-name" required placeholder="Digite o nome da pasta">
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="closeFolderModal()">Cancelar</button>
+                        <button type="submit" class="btn-primary">Criar Pasta</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Marketplace Modal -->
+    <div class="modal-overlay" id="marketplace-modal">
+        <div class="modal marketplace-modal">
+            <div class="modal-header">
+                <h3>Marketplace de Prompts</h3>
+                <button class="btn-icon" onclick="closeMarketplaceModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="marketplace-content">
+                    <div class="marketplace-search">
+                        <input type="text" id="marketplace-search" placeholder="Pesquisar prompts públicos...">
+                    </div>
+                    <div class="marketplace-categories">
+                        <button class="category-btn active" data-category="todos">Todos</button>
+                        <button class="category-btn" data-category="escrita">Escrita</button>
+                        <button class="category-btn" data-category="codigo">Código</button>
+                        <button class="category-btn" data-category="marketing">Marketing</button>
+                        <button class="category-btn" data-category="educacao">Educação</button>
+                    </div>
+                    <div class="marketplace-prompts" id="marketplace-prompts">
+                        <!-- Marketplace prompts will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>
